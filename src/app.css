@@ -1,0 +1,272 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FamiPass Design System - Custom Theme Extensions (Tailwind v4)
+───────────────────────────────────────────────────────────────────────── */
+@theme {
+	--font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+	--font-mono: 'Space Grotesk', monospace, system-ui;
+
+	/* Mapeo de variables CSS a colores nativos de Tailwind */
+	--color-bg-base        : var( --bg-base );
+	--color-bg-surface     : var( --bg-surface );
+	--color-bg-surface-2   : var( --bg-surface-2 );
+	--color-text-primary   : var( --text-primary );
+	--color-text-secondary : var( --text-secondary );
+	--color-text-muted     : var( --text-muted );
+	--color-border         : var( --border );
+	--color-border-focus   : var( --border-focus );
+	--color-accent         : var( --accent );
+	--color-accent-hover   : var( --accent-hover );
+	--color-accent-muted   : var( --accent-muted );
+	--color-accent-text    : var( --accent-text );
+
+	/* Primitivos Cálipso */
+	--color-calypso-50  : #e0f7fa;
+	--color-calypso-100 : #b2ebf2;
+	--color-calypso-200 : #80deea;
+	--color-calypso-300 : #4dd0e1;
+	--color-calypso-400 : #26c6da;
+	--color-calypso-500 : #00b4d8;
+	--color-calypso-600 : #0097b5;
+	--color-calypso-700 : #0077a8;
+	--color-calypso-800 : #006494;
+	--color-calypso-900 : #004d75;
+
+	/* Primitivos Dorado */
+	--color-gold-300 : #fcd34d;
+	--color-gold-400 : #fbbf24;
+	--color-gold-500 : #f59e0b;
+	--color-gold-600 : #d97706;
+	--color-gold-700 : #b45309;
+
+	/* Primitivos Navy */
+	--color-navy-700 : #254d72;
+	--color-navy-800 : #1e3a55;
+	--color-navy-900 : #1a2c42;
+	--color-navy-950 : #0d1b2a;
+
+	/* Animaciones y keyframes de resplandor ambiental */
+	--animate-glow-slow   : glow-slow 15s ease-in-out infinite;
+	--animate-glow-medium : glow-medium 20s ease-in-out infinite;
+	--animate-glow-fast   : glow-fast 12s ease-in-out infinite;
+
+	@keyframes glow-slow {
+		0%, 100% {
+			transform : translate( 0px, 0px ) scale( 1 );
+			opacity   : 0.8;
+		}
+		50% {
+			transform : translate( 40px, -40px ) scale( 1.15 );
+			opacity   : 0.45;
+		}
+	}
+
+	@keyframes glow-medium {
+		0%, 100% {
+			transform : translate( 0px, 0px ) scale( 1 );
+			opacity   : 0.6;
+		}
+		50% {
+			transform : translate( -30px, 30px ) scale( 0.9 );
+			opacity   : 0.3;
+		}
+	}
+
+	@keyframes glow-fast {
+		0%, 100% {
+			transform : translate( 0px, 0px ) scale( 1 );
+			opacity   : 0.7;
+		}
+		50% {
+			transform : translate( -20px, -20px ) scale( 1.1 );
+			opacity   : 0.35;
+		}
+	}
+}
+
+:root {
+	/* ── Primitivos Neutros ── */
+	--slate-50  : #f8fafc;
+	--slate-100 : #f1f5f9;
+	--slate-200 : #e2e8f0;
+	--slate-300 : #cbd5e1;
+	--slate-400 : #94a3b8;
+	--slate-500 : #64748b;
+	--slate-600 : #475569;
+	--slate-700 : #334155;
+	--slate-800 : #1e293b;
+	--slate-900 : #0f172a;
+}
+
+/* ── Tokens Light (default) ── */
+html, html.light {
+	--bg-base        : #ffffff;
+	--bg-surface     : var( --slate-50 );
+	--bg-surface-2   : var( --slate-100 );
+	--bg-sidebar     : rgba( 255, 255, 255, 0.85 );
+
+	--text-primary   : var( --slate-800 );
+	--text-secondary : var( --slate-500 );
+	--text-muted     : var( --slate-400 );
+	--text-inverted  : #ffffff;
+
+	--border         : var( --slate-200 );
+	--border-focus   : var( --color-calypso-500 );
+
+	--accent         : var( --color-calypso-500 );
+	--accent-hover   : var( --color-calypso-600 );
+	--accent-muted   : var( --color-calypso-50 );
+	--accent-text    : #ffffff;
+
+	--shadow-sm  : 0 1px 3px rgba( 0, 0, 0, 0.08 ), 0 1px 2px rgba( 0, 0, 0, 0.04 );
+	--shadow-md  : 0 4px 6px rgba( 0, 0, 0, 0.07 ), 0 2px 4px rgba( 0, 0, 0, 0.04 );
+	--shadow-lg  : 0 10px 24px rgba( 0, 0, 0, 0.1 ), 0 4px 8px rgba( 0, 0, 0, 0.06 );
+	--shadow-glow: 0 0 20px rgba( 0, 180, 216, 0.25 );
+}
+
+/* ── Tokens Dark ── */
+html.dark {
+	--bg-base        : var( --color-navy-950 );
+	--bg-surface     : var( --color-navy-900 );
+	--bg-surface-2   : var( --color-navy-800 );
+	--bg-sidebar     : rgba( 13, 27, 42, 0.9 );
+
+	--text-primary   : var( --slate-100 );
+	--text-secondary : var( --slate-400 );
+	--text-muted     : var( --slate-600 );
+	--text-inverted  : var( --color-navy-950 );
+
+	--border         : var( --color-navy-700 );
+	--border-focus   : var( --color-gold-500 );
+
+	--accent         : var( --color-gold-500 );
+	--accent-hover   : var( --color-gold-400 );
+	--accent-muted   : rgba( 245, 158, 11, 0.12 );
+	--accent-text    : var( --color-navy-950 );
+
+	--shadow-sm  : 0 1px 3px rgba( 0, 0, 0, 0.4 ), 0 1px 2px rgba( 0, 0, 0, 0.3 );
+	--shadow-md  : 0 4px 6px rgba( 0, 0, 0, 0.35 ), 0 2px 4px rgba( 0, 0, 0, 0.25 );
+	--shadow-lg  : 0 10px 24px rgba( 0, 0, 0, 0.5 ), 0 4px 8px rgba( 0, 0, 0, 0.35 );
+	--shadow-glow: 0 0 20px rgba( 245, 158, 11, 0.3 );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Base Defaults
+───────────────────────────────────────────────────────────────────────── */
+html {
+	font-family             : var( --font-sans );
+	font-size               : 16px;
+	-webkit-font-smoothing  : antialiased;
+	-moz-osx-font-smoothing : grayscale;
+	scroll-behavior         : smooth;
+}
+
+body {
+	background-color: var( --bg-base );
+	color           : var( --text-primary );
+	min-height      : 100vh;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Scrollbar personalizado
+───────────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+	width  : 6px;
+	height : 6px;
+}
+
+::-webkit-scrollbar-track {
+	background : transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background    : var( --border );
+	border-radius : 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background : var( --text-muted );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Utilidades globales
+───────────────────────────────────────────────────────────────────────── */
+.card {
+	border-radius : 16px;
+	transition    : box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+html.light .card {
+	background : var( --bg-surface );
+	border     : 1px solid rgba( 203, 213, 225, 0.85 );
+	box-shadow : var( --shadow-md );
+}
+
+html.light .card:hover {
+	box-shadow : var( --shadow-lg );
+}
+
+html.dark .card {
+	background : linear-gradient( to bottom, var( --bg-surface ), var( --bg-surface-2 ) );
+	border     : 1px solid var( --border );
+	box-shadow : var( --shadow-sm );
+}
+
+html.dark .card:hover {
+	box-shadow : var( --shadow-glow );
+}
+
+.glass {
+	background              : var( --bg-sidebar );
+	backdrop-filter         : blur( 16px );
+	-webkit-backdrop-filter : blur( 16px );
+	border-bottom           : 1px solid var( --border );
+}
+
+.focus-ring:focus-visible {
+	outline        : 2px solid var( --accent );
+	outline-offset : 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Status colors
+───────────────────────────────────────────────────────────────────────── */
+.status-draft       { --status-bg: #e2e8f0; --status-text: #475569; }
+.status-in-progress { --status-bg: rgba( 0, 180, 216, 0.15 ); --status-text: var( --color-calypso-700 ); }
+.status-finished    { --status-bg: #d1fae5; --status-text: #065f46; }
+.status-cancelled   { --status-bg: #fee2e2; --status-text: #991b1b; }
+.status-pending     { --status-bg: #fef3c7; --status-text: #92400e; }
+.status-completed   { --status-bg: #d1fae5; --status-text: #065f46; }
+
+html.dark .status-draft       { --status-bg: rgba( 148, 163, 184, 0.15 ); --status-text: var( --slate-400 ); }
+html.dark .status-in-progress { --status-bg: rgba( 0, 180, 216, 0.2 );   --status-text: var( --color-calypso-300 ); }
+html.dark .status-finished    { --status-bg: rgba( 52, 211, 153, 0.15 );  --status-text: #6ee7b7; }
+html.dark .status-cancelled   { --status-bg: rgba( 248, 113, 113, 0.15 ); --status-text: #fca5a5; }
+html.dark .status-pending     { --status-bg: rgba( 251, 191, 36, 0.15 );  --status-text: var( --color-gold-400 ); }
+html.dark .status-completed   { --status-bg: rgba( 52, 211, 153, 0.15 );  --status-text: #6ee7b7; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Form Cards & Page Header Banners (Glowing Styles)
+───────────────────────────────────────────────────────────────────────── */
+.form-card {
+	@apply rounded-2xl p-6 space-y-6 transition-all duration-300;
+}
+
+html.light .form-card {
+	@apply bg-(--bg-surface) border border-slate-300/85 shadow-md hover:border-accent/30 hover:shadow-lg;
+}
+
+html.dark .form-card {
+	@apply bg-linear-to-b from-(--bg-surface) to-(--bg-surface-2) border border-(--border)/60 shadow-sm hover:border-accent/30 hover:shadow-(--shadow-glow);
+}
+
+.header-banner {
+	@apply p-5 rounded-2xl bg-linear-to-r from-accent/10 via-accent/5 to-transparent border border-accent/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative overflow-hidden select-none;
+}
+
+.header-glow {
+	@apply absolute inset-0 bg-radial from-accent/5 via-transparent to-transparent opacity-50 group-hover:opacity-80 transition-opacity duration-500 pointer-events-none;
+}

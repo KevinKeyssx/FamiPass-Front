@@ -1,0 +1,38 @@
+{
+	"name": "famipass-front",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev --port 3214",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/kit": "^2.70.2",
+		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"@tailwindcss/vite": "^4.3.3",
+		"@types/node": "^26.2.0",
+		"svelte": "^5.56.8",
+		"svelte-check": "^4.7.5",
+		"tailwindcss": "^4.3.3",
+		"typescript": "^5.7.3",
+		"vite": "^8.2.1"
+	},
+	"dependencies": {
+		"@internationalized/date": "^3.12.3",
+		"@lucide/svelte": "^1.30.0",
+		"@supabase/supabase-js": "^2.112.2",
+		"@tanstack/svelte-query": "^6.1.38",
+		"better-auth": "^1.6.26",
+		"bits-ui": "^2.18.1",
+		"html5-qrcode": "^2.3.8",
+		"qr-code-styling": "^1.9.2",
+		"svelte-french-toast": "^1.2.0",
+		"zod": "^4.4.3"
+	}
+}
