@@ -1,28 +1,27 @@
-import type { PageServerLoad, Actions } from './$types.js';
-import { getFamilyById }                  from '$lib/server/supabase/services/families.service.js';
+import { fail } from '@sveltejs/kit';
+
 import {
-	getFamilyTickets,
+    getFamilyTickets,
 	getAvailableEventsForFamily,
 	linkFamilyToEvent
-}                                         from '$lib/server/supabase/services/events.service.js';
-import { fail }                           from '@sveltejs/kit';
+}                                            from '$lib/server/supabase/services/events.service.js';
+import { getFamilyById, getFamilyForUser }  from '$lib/server/supabase/services/families.service.js';
+import type { PageServerLoad, Actions }     from './$types.js';
 
-export const load: PageServerLoad = async ( { cookies, url } ) => {
-	const paramFamilyId  = url.searchParams.get( 'familyId' );
-	const cookieFamilyId = cookies.get( 'famipass_family_id' );
-	const activeFamilyId = paramFamilyId || cookieFamilyId;
 
-	if ( !activeFamilyId ) {
-		return {
-			family          : null,
-			tickets         : [],
-			availableEvents : []
-		};
-	}
+export const load: PageServerLoad = async ( { locals, url, cookies } ) => {
+	const paramFamilyId = url.searchParams.get( 'familyId' );
+
+	let family = null;
 
 	try {
-		const family = await getFamilyById( activeFamilyId );
+		if ( paramFamilyId ) {
+			family = await getFamilyById( paramFamilyId );
+		} else if ( locals.user ) {
+			family = await getFamilyForUser( locals.user.id, locals.user.email );
+		}
 
+		// Si no tiene familia vinculada, limpiar cualquier cookie residual antigua
 		if ( !family ) {
 			cookies.delete( 'famipass_family_id', { path : '/' } );
 			return {
@@ -32,17 +31,8 @@ export const load: PageServerLoad = async ( { cookies, url } ) => {
 			};
 		}
 
-		if ( paramFamilyId ) {
-			cookies.set( 'famipass_family_id', activeFamilyId, {
-				path     : '/',
-				maxAge   : 60 * 60 * 24 * 365,
-				httpOnly : false,
-				sameSite : 'lax'
-			} );
-		}
-
-		const tickets         = await getFamilyTickets( activeFamilyId );
-		const availableEvents = await getAvailableEventsForFamily( activeFamilyId );
+		const tickets         = await getFamilyTickets( family.id );
+		const availableEvents = await getAvailableEventsForFamily( family.id );
 
 		return {
 			family,
@@ -60,11 +50,15 @@ export const load: PageServerLoad = async ( { cookies, url } ) => {
 };
 
 export const actions: Actions = {
-	joinEvent : async ( { request, cookies } ) => {
-		const activeFamilyId = cookies.get( 'famipass_family_id' );
+	joinEvent : async ( { request, locals } ) => {
+		if ( !locals.user ) {
+			return fail( 401, { error : 'Debes iniciar sesión para inscribir a tu familia en un evento.' } );
+		}
 
-		if ( !activeFamilyId ) {
-			return fail( 400, { error : 'No se encontró una familia activa vinculada.' } );
+		const family = await getFamilyForUser( locals.user.id, locals.user.email );
+
+		if ( !family ) {
+			return fail( 400, { error : 'No se encontró una familia activa vinculada a tu cuenta.' } );
 		}
 
 		const formData = await request.formData();
@@ -75,7 +69,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await linkFamilyToEvent( activeFamilyId, eventId );
+			await linkFamilyToEvent( family.id, eventId );
 			return { success : true };
 		} catch ( err : any ) {
 			return fail( 400, { error : err.message } );
