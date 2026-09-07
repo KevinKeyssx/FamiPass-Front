@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { onMount, onDestroy }                               from 'svelte';
-	import { Html5Qrcode, Html5QrcodeSupportedFormats }          from 'html5-qrcode';
-	import { Camera, Flashlight, RefreshCw, QrCode, ArrowRight } from '@lucide/svelte';
-	import { PinInput }                                          from 'bits-ui';
-	import Button                                                from '$lib/components/ui/Button.svelte';
+	import { onMount, onDestroy } from 'svelte';
 
-	interface Props {
+    import { Html5Qrcode, Html5QrcodeSupportedFormats }          from 'html5-qrcode';
+	import { Camera, Flashlight, RefreshCw, QrCode, ArrowRight } from '@lucide/svelte';
+
+    import PinInput from '$lib/components/ui/PinInput.svelte';
+	import Button   from '$lib/components/ui/Button.svelte';
+
+
+    interface Props {
 		onScan   : ( code : string ) => Promise<boolean | void> | boolean | void;
 		loading? : boolean;
 	}
@@ -229,31 +232,15 @@
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<div class="flex justify-center w-full">
-				<PinInput.Root
-					bind:value={manualCode}
-					maxlength={6}
-					pattern={ALPHANUMERIC_PATTERN}
-					onComplete={( val ) => {
-						handleSuccessfulScan( val.toUpperCase() );
-					}}
-				>
-					{#snippet children( { cells } )}
-						<div class="flex items-center gap-2 justify-center">
-							{#each cells as cell}
-								<PinInput.Cell
-									{cell}
-									class="w-11 h-14 rounded-2xl border text-center font-black text-xl text-(--accent) transition-all duration-300 uppercase flex items-center justify-center
-									       {cell.isActive ? 'border-(--accent) ring-4 ring-(--accent)/10 scale-105 shadow-[0_0_15px_rgba(0,180,216,0.2)]' : 'border-(--border) hover:border-(--accent)/40'}
-									       {cell.char ? 'bg-(--accent-muted)/10 border-(--accent)/30' : 'bg-(--bg-surface-2)'}"
-								>
-									{cell.char}
-								</PinInput.Cell>
-							{/each}
-						</div>
-					{/snippet}
-				</PinInput.Root>
-			</div>
+			<PinInput
+				bind:value={manualCode}
+				length={6}
+				pattern={ALPHANUMERIC_PATTERN}
+				disabled={loading}
+				onComplete={( val ) => {
+					handleSuccessfulScan( val.toUpperCase() );
+				}}
+			/>
 
 			<Button
 				type="button"
