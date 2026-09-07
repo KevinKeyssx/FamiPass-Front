@@ -436,7 +436,7 @@
 							<p class="text-[10px] font-mono text-(--text-muted) uppercase font-bold">Orden #{o.id.slice( 0, 8 )}</p>
 							<p class="text-xs text-(--text-secondary) mt-0.5">{formatDateTime( o.created_at )}</p>
 							<p class="text-[11px] text-(--text-muted) mt-1">
-								Operador: <span class="font-semibold text-(--text-primary)">{o.scanned_by_user?.full_name ?? 'Operador'}</span>
+								Operador: <span class="font-semibold text-(--text-primary)">{o.scanned_by_user?.user_name ?? 'Operador'}</span>
 							</p>
 						</div>
 
