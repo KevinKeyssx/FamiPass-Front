@@ -54,9 +54,11 @@
 	<div class="w-full max-w-md p-8 sm:p-10 card relative z-10">
 		<!-- Logo & Title -->
 		<div class="flex flex-col items-center mb-8 text-center">
-			<div class="w-16 h-16 rounded-2xl bg-(--accent) flex items-center justify-center mb-4 shadow-(--shadow-glow)">
-				<span class="text-(--accent-text) font-black text-3xl font-mono">F</span>
-			</div>
+			<img
+				src="/logo/logo_medium.avif"
+				alt="FamiPass Logo"
+				class="w-20 h-20 object-contain mb-4 drop-shadow-md transition-transform duration-300 hover:scale-105 select-none"
+			/>
 			<h1 class="text-2xl font-extrabold text-(--text-primary) tracking-tight">
 				FamiPass
 			</h1>
