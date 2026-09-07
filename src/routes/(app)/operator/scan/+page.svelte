@@ -1,19 +1,25 @@
 <script lang="ts">
-	import { goto }          from '$app/navigation';
-	import { deserialize }   from '$app/forms';
-	import toast             from 'svelte-french-toast';
-	import CameraScanner     from '$lib/components/qr/CameraScanner.svelte';
-	import { QrCode }        from '@lucide/svelte';
+	import { goto }         from '$app/navigation';
+	import { deserialize }  from '$app/forms';
 
-	let isValidating = $state( false );
+    import toast        from 'svelte-french-toast';
+	import { QrCode }   from '@lucide/svelte';
 
-	async function handleScan( code : string ): Promise<boolean> {
+    import CameraScanner from '$lib/components/qr/CameraScanner.svelte';
+
+
+    let isValidating = $state( false );
+
+
+    async function handleScan( code : string ): Promise<boolean> {
 		if ( isValidating ) return false;
-		isValidating = true;
-		const toastId = toast.loading( 'Validando ticket familiar...' );
 
+        isValidating = true;
+
+        const toastId = toast.loading( 'Validando ticket familiar...' );
 		const formData = new FormData();
-		formData.append( 'hash', code );
+
+        formData.append( 'hash', code );
 
 		try {
 			const res = await fetch( '?/validateHash', {
@@ -25,22 +31,31 @@
 
 			if ( result.type === 'redirect' ) {
 				toast.success( '¡Ticket encontrado!', { id : toastId } );
-				goto( result.location );
-				return true;
+
+                goto( result.location );
+
+                return true;
 			} else if ( result.type === 'failure' ) {
 				const errorMsg = ( result.data as any )?.error || 'Código no reconocido.';
-				toast.error( errorMsg, { id : toastId, duration : 4000 } );
-				isValidating = false;
-				return false;
+
+                toast.error( errorMsg, { id : toastId, duration : 4000 } );
+
+                isValidating = false;
+
+                return false;
 			} else {
 				toast.error( 'No se pudo procesar el código.', { id : toastId, duration : 4000 } );
-				isValidating = false;
-				return false;
+
+                isValidating = false;
+
+                return false;
 			}
 		} catch ( err : any ) {
 			toast.error( err.message || 'Error de conexión al validar ticket.', { id : toastId, duration : 4000 } );
-			isValidating = false;
-			return false;
+
+            isValidating = false;
+
+            return false;
 		}
 	}
 </script>
@@ -59,11 +74,13 @@
 				<span class="p-1 rounded-lg bg-(--accent-muted) text-(--accent)">
 					<QrCode size={18} />
 				</span>
-				<h1 class="text-2xl font-black text-(--text-primary) tracking-tight">
+
+                <h1 class="text-2xl font-black text-(--text-primary) tracking-tight">
 					Escáner de Tickets
 				</h1>
 			</div>
-			<p class="text-xs text-(--text-secondary)">
+
+            <p class="text-xs text-(--text-secondary)">
 				Escanea el código QR de un familiar o digita el PIN para realizar la entrega de raciones
 			</p>
 		</div>
