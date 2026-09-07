@@ -12,6 +12,7 @@
 	}
 
 	interface Props {
+		id?          : string;
 		label?       : string;
 		value        : string;
 		options      : Option[];
@@ -23,6 +24,7 @@
 	}
 
 	let {
+		id          = '',
 		label       = '',
 		value       = $bindable( '' ),
 		options     = [],
@@ -41,16 +43,20 @@
 <Select.Root type="single" bind:value={value} {disabled} {required}>
 	<div class="flex flex-col gap-1.5 w-full">
 		{#if label}
-			<span class="text-sm font-medium text-text-primary select-none">
+			<label
+				for={id || undefined}
+				class="text-sm font-medium text-text-primary select-none cursor-pointer"
+			>
 				{label}
 				{#if required}
 					<span class="text-accent">*</span>
 				{/if}
-			</span>
+			</label>
 		{/if}
 
 		<div class="relative w-full">
 			<Select.Trigger
+				id={id || undefined}
 				class="w-full transition-all duration-300 flex items-center justify-between text-left border disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer group
                     bg-bg-surface-2 text-text-primary placeholder:text-text-muted
                     focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/10
