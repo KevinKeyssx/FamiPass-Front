@@ -2,12 +2,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+	font-family  : 'Inter';
+	src          : url( '/fonts/Inter_18pt-Regular.woff2' ) format( 'woff2' );
+	font-weight  : 400;
+	font-style   : normal;
+	font-display : swap;
+}
+
+@font-face {
+	font-family  : 'Inter';
+	src          : url( '/fonts/Inter_18pt-Black.woff2' ) format( 'woff2' );
+	font-weight  : 900;
+	font-style   : normal;
+	font-display : swap;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────
    FamiPass Design System - Custom Theme Extensions (Tailwind v4)
 ───────────────────────────────────────────────────────────────────────── */
 @theme {
-	--font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-	--font-mono: 'Space Grotesk', monospace, system-ui;
+	--font-sans    : 'Inter', system-ui, -apple-system, sans-serif;
+	--font-heading : 'Inter', system-ui, -apple-system, sans-serif;
+	--font-mono    : 'Space Grotesk', monospace, system-ui;
 
 	/* Mapeo de variables CSS a colores nativos de Tailwind */
 	--color-bg-base        : var( --bg-base );
@@ -165,9 +182,15 @@ html {
 }
 
 body {
-	background-color: var( --bg-base );
-	color           : var( --text-primary );
-	min-height      : 100vh;
+	background-color : var( --bg-base );
+	color            : var( --text-primary );
+	font-weight      : 400;
+	min-height       : 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family : var( --font-heading );
+	font-weight : 900;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
