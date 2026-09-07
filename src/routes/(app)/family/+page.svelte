@@ -124,12 +124,15 @@
 					</Button>
 				</a>
 
+				<!--
+				TODO: Deshabilitado temporalmente hasta implementar el sistema de invitaciones y validación por correo del administrador.
 				<a href="/family/link" class="w-full sm:w-auto">
 					<Button variant="secondary" size="lg" class="w-full">
 						<Link2 size={18} />
 						<span>Vincular por Código</span>
 					</Button>
 				</a>
+				-->
 			</div>
 		</div>
 	{:else}
@@ -202,7 +205,7 @@
 						type="submit"
 						variant="primary"
 						size="md"
-						class="w-full h-[42px]"
+						class="w-full h-10.5"
 						loading={ isJoining }
 						disabled={ !selectedEventId || isJoining }
 					>
