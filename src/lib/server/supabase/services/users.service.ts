@@ -17,20 +17,19 @@ export async function getUserRole(
 export async function getUserByEmail(
 	email : string
 ): Promise<User | null> {
+	const cleanEmail = email.trim().toLowerCase();
+
 	const { data, error } = await supabaseServer
 		.from( 'users' )
 		.select( '*' )
-		.eq( 'email', email )
-		.single();
+		.ilike( 'email', cleanEmail )
+		.limit( 1 );
 
 	if ( error ) {
-		if ( error.code === 'PGRST116' ) {
-			return null;
-		}
 		throw new Error( error.message );
 	}
 
-	return data as User;
+	return data && data.length > 0 ? ( data[ 0 ] as User ) : null;
 }
 
 export async function getUserById( id : string ): Promise<User> {
@@ -74,8 +73,7 @@ export async function ensureUserExists(
 
 	const newUser : Omit<User, 'id' | 'created_at' | 'updated_at'> = {
 		email     : authUser.email,
-		full_name : authUser.name || authUser.email.split( '@' )[ 0 ] || 'Usuario',
-		user_name : null,
+		user_name : authUser.name || authUser.email.split( '@' )[ 0 ] || 'Usuario',
 		phone     : null,
 		role      : 'MEMBER',
 		is_active : true
