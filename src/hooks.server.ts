@@ -10,16 +10,24 @@ export const handle: Handle = async ( { event, resolve } ) => {
 		} );
 
 		if ( session ) {
-			event.locals.user    = session.user;
-			event.locals.session = session.session;
+			let dbUserId = session.user.id;
 
 			// Auto-creación y sincronización de usuario en la tabla users con rol MEMBER
 			if ( session.user.email ) {
-				await ensureUserExists( {
+				const dbUser = await ensureUserExists( {
 					email : session.user.email,
 					name  : session.user.name
 				} );
+				if ( dbUser?.id ) {
+					dbUserId = dbUser.id;
+				}
 			}
+
+			event.locals.user = {
+				...session.user,
+				id : dbUserId
+			};
+			event.locals.session = session.session;
 		} else {
 			event.locals.user    = null;
 			event.locals.session = null;
