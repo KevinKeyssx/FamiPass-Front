@@ -12,7 +12,8 @@
         Eye,
         UserPlus,
         Search,
-        RotateCcw
+        RotateCcw,
+        CircleAlert
     } from '@lucide/svelte';
 
     import type {
@@ -27,10 +28,10 @@
 
     interface Props {
 		members            : FamilyMember[];
-		totalMembersCount? : number;
 		currentUserId?     : string;
 		currentUserEmail?  : string;
 		currentUserRole?   : FamilyMemberRole;
+		hasTempRut?        : boolean;
 		hasActiveFilters?  : boolean;
 		onResetFilters?    : () => void;
 		onEdit             : ( member : FamilyMember ) => void;
@@ -50,10 +51,10 @@
 
 	let {
 		members,
-		totalMembersCount,
 		currentUserId,
 		currentUserEmail,
 		currentUserRole = 'ADMIN',
+		hasTempRut = false,
 		hasActiveFilters = false,
 		onResetFilters,
 		onEdit,
@@ -167,7 +168,17 @@
 						<div class="flex items-center gap-2 text-(--text-secondary)">
 							<CreditCard size={13} class="text-(--text-muted) shrink-0" />
 							<span class="font-semibold w-12 text-(--text-muted)">RUT:</span>
-							<span class="font-mono text-(--text-primary)">{formatRut( m.rut )}</span>
+							{#if m.rut?.includes( 'TEMP' )}
+								<span
+									class="font-mono text-red-400 font-bold inline-flex items-center gap-1 cursor-help select-none"
+									title="RUT temporal: Debes editar tus datos e ingresar tu RUT correctamente"
+								>
+									<CircleAlert size={13} class="text-red-400 shrink-0" />
+									<span>{m.rut}</span>
+								</span>
+							{:else}
+								<span class="font-mono text-(--text-primary)">{formatRut( m.rut )}</span>
+							{/if}
 						</div>
 
 						{#if m.email}
@@ -180,7 +191,7 @@
 
 						<div class="flex items-center gap-2 text-(--text-secondary)">
 							<Phone size={13} class="text-(--text-muted) shrink-0" />
-							<span class="font-semibold w-12 text-(--text-muted)">Teléfono:</span>
+							<span class="font-semibold w-12 text-(--text-muted)">N° Cel:</span>
 							<span class="text-(--text-primary)">{m.phone || '—'}</span>
 						</div>
 
@@ -191,6 +202,16 @@
 								{getOrgLabel( m.organization )}
 							</span>
 						</div>
+
+						{#if m.rut?.includes( 'TEMP' )}
+							<div
+								class="flex items-center gap-1.5 text-[11px] text-red-400 bg-red-500/10 border border-red-500/25 px-2.5 py-1.5 rounded-xl cursor-help select-none mt-1"
+								title="RUT temporal: Debes editar tus datos e ingresar tu RUT correctamente"
+							>
+								<CircleAlert size={13} class="shrink-0 text-red-400" />
+								<span>RUT temporal: Edita tus datos para poner tu RUT correctamente.</span>
+							</div>
+						{/if}
 					</div>
 				</div>
 			{/each}
@@ -199,39 +220,49 @@
 
 	<!-- Formulario en línea al final de la página (para ADMIN y AGGREGATOR) -->
 	{#if currentUserRole === 'ADMIN' || currentUserRole === 'AGGREGATOR'}
-		<div class="card p-5 bg-linear-to-b from-(--bg-surface) to-(--bg-surface-2) border border-(--border)/60 rounded-2xl">
-			<h3 class="text-sm font-bold text-(--text-primary) mb-3 flex items-center gap-2 select-none">
-				<Users size={16} class="text-(--accent)" />
-				<span>Agregar Nuevo Miembro a la Familia</span>
-			</h3>
-
-			<div class="overflow-x-auto">
-				<table class="w-full text-sm">
-					<thead>
-						<tr class="border-b border-(--border) bg-(--bg-surface-2)/50 select-none">
-							<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/5">Nombre</th>
-							<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">RUT</th>
-							<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/6">Correo</th>
-							<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">Teléfono</th>
-							<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">Organización</th>
-							<th class="text-center px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">Rol</th>
-							<th class="text-center px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/12" title="Autorizado para retirar pedidos">Retirar</th>
-							<th class="text-right px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/12">Acciones</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-(--border)">
-						<FamilyMemberRowForm currentUserRole={currentUserRole} onSubmit={onAdd} isSaving={isSaving} />
-
-						{#if saveError}
-							<tr class="bg-red-500/5 select-none">
-								<td colspan="8" class="px-4 py-2 text-xs text-red-500 text-right font-semibold">
-									{saveError}
-								</td>
-							</tr>
-						{/if}
-					</tbody>
-				</table>
+		{#if hasTempRut}
+			<div class="card p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-3 text-xs text-amber-300 select-none">
+				<CircleAlert size={18} class="shrink-0 text-amber-400" />
+				<div>
+					<p class="font-bold text-amber-200">No puedes agregar más integrantes aún</p>
+					<p class="text-amber-300/80 mt-0.5">Tienes un RUT temporal asignado. Debes editar tus datos e ingresar tu RUT correctamente antes de agregar nuevos miembros.</p>
+				</div>
 			</div>
-		</div>
+		{:else}
+			<div class="card p-5 bg-linear-to-b from-(--bg-surface) to-(--bg-surface-2) border border-(--border)/60 rounded-2xl">
+				<h3 class="text-sm font-bold text-(--text-primary) mb-3 flex items-center gap-2 select-none">
+					<Users size={16} class="text-(--accent)" />
+					<span>Agregar Nuevo Miembro a la Familia</span>
+				</h3>
+
+				<div class="overflow-x-auto">
+					<table class="w-full text-sm">
+						<thead>
+							<tr class="border-b border-(--border) bg-(--bg-surface-2)/50 select-none">
+								<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/5">Nombre</th>
+								<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">RUT</th>
+								<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/6">Correo</th>
+								<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">Teléfono</th>
+								<th class="text-left px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">Organización</th>
+								<th class="text-center px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/8">Rol</th>
+								<th class="text-center px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/12" title="Autorizado para retirar pedidos">Retirar</th>
+								<th class="text-right px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-(--text-secondary)/80 w-1/12">Acciones</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-(--border)">
+							<FamilyMemberRowForm currentUserRole={currentUserRole} onSubmit={onAdd} isSaving={isSaving} />
+
+							{#if saveError}
+								<tr class="bg-red-500/5 select-none">
+									<td colspan="8" class="px-4 py-2 text-xs text-red-500 text-right font-semibold">
+										{saveError}
+									</td>
+								</tr>
+							{/if}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		{/if}
 	{/if}
 </div>
