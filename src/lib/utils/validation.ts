@@ -43,6 +43,10 @@ export function formatRut( rut: string ): string {
 		return '';
 	}
 
+	if ( rut.startsWith( 'TEMP-' ) || rut.includes( 'TEMP' ) ) {
+		return rut;
+	}
+
 	const clean = rut.replace( /[^0-9kK]/g, '' );
 
 	if ( clean.length < 2 ) {
