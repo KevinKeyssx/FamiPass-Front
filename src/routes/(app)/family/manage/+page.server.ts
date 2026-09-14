@@ -116,8 +116,9 @@ export const actions: Actions = {
 					const dbUser = await ensureUserExists( {
 						email : sessionUser.email,
 						name  : sessionUser.name
-					} );
-					if ( dbUser?.id ) {
+					});
+
+                    if ( dbUser?.id ) {
 						dbUserId = dbUser.id;
 					}
 				}
@@ -136,18 +137,18 @@ export const actions: Actions = {
 						user_id           : dbUserId
 					} );
 				} else {
-					const tempRutNumber = Math.floor( 10000000 + Math.random() * 90000000 );
-					await createFamilyMember( {
+					const tempRutNumber = Math.floor( 100000 + Math.random() * 900000 );
+					await createFamilyMember({
 						family_id         : targetFamily.id,
 						full_name         : sessionUser.name || sessionUser.email?.split( '@' )[ 0 ] || 'Representante',
-						rut               : `TEMP-${ tempRutNumber }-K`,
+						rut               : `TEMP-${ tempRutNumber }K`,
 						email             : sessionUser.email || null,
 						phone             : null,
 						organization      : 'NINGUNA',
 						is_representative : true,
 						role              : 'ADMIN',
 						user_id           : dbUserId
-					} );
+					});
 				}
 
 				return { success : true, familyId : targetFamily.id };
@@ -156,7 +157,12 @@ export const actions: Actions = {
 			if ( err.message?.includes( 'duplicate key' ) || err.message?.includes( 'unique constraint' ) ) {
 				return fail( 400, { error : `Ya existe una familia registrada con el nombre "${ familyName }". Por favor ingresa un nombre diferente.` } );
 			}
-			return fail( 400, { error : err.message } );
+
+            if ( err.message?.includes( 'value too long' ) ) {
+				return fail( 400, { error : 'Uno de los campos supera la longitud permitida en la base de datos.' } );
+			}
+
+            return fail( 400, { error : err.message } );
 		}
 	},
 
@@ -195,6 +201,11 @@ export const actions: Actions = {
 
 		if ( !memberId && currentUserRole !== 'ADMIN' && currentUserRole !== 'AGGREGATOR' ) {
 			return fail( 403, { error : 'No tienes permisos para agregar nuevos miembros a la familia.' } );
+		}
+
+		// Validar que el usuario actual no tenga un RUT temporal antes de agregar nuevos miembros
+		if ( !memberId && currentMember?.rut?.includes( 'TEMP' ) ) {
+			return fail( 400, { error : 'Debes actualizar tu RUT antes de poder agregar nuevos integrantes a la familia.' } );
 		}
 
 		const fullName         = ( formData.get( 'full_name' ) as string )?.trim();
