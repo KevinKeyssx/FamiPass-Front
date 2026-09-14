@@ -8,7 +8,8 @@
         UserPlus,
         Shield,
         Eye,
-        RotateCcw
+        RotateCcw,
+        CircleAlert
     }               from '@lucide/svelte';
     import toast    from 'svelte-french-toast';
 
@@ -48,6 +49,15 @@
 
 
     const currentView = $derived( page.url.searchParams.get( 'view' ) || 'card' );
+
+	const currentMember = $derived(
+		data.members.find( ( m ) =>
+			( data.currentUser?.id && m.user_id && m.user_id === data.currentUser.id ) ||
+			( data.currentUser?.email && m.email && m.email.toLowerCase() === data.currentUser.email.toLowerCase() )
+		)
+	);
+
+	const hasTempRut = $derived( Boolean( currentMember?.rut?.includes( 'TEMP' ) ) );
 
 
     let familyName     = $state( '' );
@@ -233,6 +243,12 @@
 		saveError      = null;
 
 		const isEditing = !!selectedMember?.id;
+		if ( !isEditing && hasTempRut ) {
+			saveError      = 'Debes actualizar tu RUT antes de poder agregar nuevos integrantes a la familia.';
+			isSavingMember = false;
+			return false;
+		}
+
 		const formData  = new FormData();
 		if ( selectedMember?.id ) {
 			formData.append( 'member_id', selectedMember.id );
@@ -416,12 +432,41 @@
 				</div>
 
 				{#if data.currentUserRole === 'ADMIN' || data.currentUserRole === 'AGGREGATOR'}
-					<Button variant="primary" size="sm" onclick={openCreateModal}>
-						<UserPlus size={14} />
-						<span>Agregar Miembro</span>
-					</Button>
+					<div title={hasTempRut ? 'Debes actualizar tu RUT antes de agregar más integrantes' : ''}>
+						<Button
+							variant="primary"
+							size="sm"
+							onclick={openCreateModal}
+							disabled={hasTempRut}
+						>
+							<UserPlus size={14} />
+							<span>Agregar Miembro</span>
+						</Button>
+					</div>
 				{/if}
 			</div>
+
+			<!-- Aviso de RUT temporal -->
+			{#if hasTempRut}
+				<div class="card p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-300 select-none">
+					<div class="flex items-center gap-2.5">
+						<CircleAlert size={18} class="shrink-0 text-amber-400" />
+						<div>
+							<p class="font-bold text-amber-200">Tienes un RUT temporal asignado</p>
+							<p class="text-amber-300/80 mt-0.5">Debes editar tus datos y poner tu RUT correctamente antes de poder agregar nuevos integrantes.</p>
+						</div>
+					</div>
+					{#if currentMember}
+						<button
+							type="button"
+							onclick={() => openEditModal( currentMember )}
+							class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 cursor-pointer transition-colors"
+						>
+							Actualizar mi RUT
+						</button>
+					{/if}
+				</div>
+			{/if}
 
 			<!-- Barra de Búsqueda y Filtros -->
 			{#if data.members.length > 0}
@@ -497,6 +542,7 @@
 					currentUserId={data.currentUser?.id}
 					currentUserEmail={data.currentUser?.email}
 					currentUserRole={data.currentUserRole}
+					hasTempRut={hasTempRut}
 					hasActiveFilters={hasActiveFilters}
 					onResetFilters={resetFilters}
 					onEdit={openEditModal}
@@ -512,6 +558,7 @@
 					currentUserId={data.currentUser?.id}
 					currentUserEmail={data.currentUser?.email}
 					currentUserRole={data.currentUserRole}
+					hasTempRut={hasTempRut}
 					hasActiveFilters={hasActiveFilters}
 					onResetFilters={resetFilters}
 					onEdit={openEditModal}
