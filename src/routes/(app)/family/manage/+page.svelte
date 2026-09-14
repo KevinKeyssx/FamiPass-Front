@@ -538,7 +538,6 @@
 			{#if currentView === 'table'}
 				<FamilyMemberTable
 					members={filteredMembers}
-					totalMembersCount={data.members.length}
 					currentUserId={data.currentUser?.id}
 					currentUserEmail={data.currentUser?.email}
 					currentUserRole={data.currentUserRole}
@@ -554,7 +553,6 @@
 			{:else}
 				<FamilyMemberCard
 					members={filteredMembers}
-					totalMembersCount={data.members.length}
 					currentUserId={data.currentUser?.id}
 					currentUserEmail={data.currentUser?.email}
 					currentUserRole={data.currentUserRole}
