@@ -193,7 +193,7 @@
 
 		<div>
 			<Select
-				label="Organización comunitaria"
+				label="Organización"
 				required={true}
 				options={orgOptions}
 				bind:value={organization}
