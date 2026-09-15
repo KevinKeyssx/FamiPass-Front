@@ -166,8 +166,8 @@
 					<!-- Body: Detalles -->
 					<div class="space-y-2 text-xs border-t border-(--border)/40 pt-2.5">
 						<div class="flex items-center gap-2 text-(--text-secondary)">
-							<CreditCard size={13} class="text-(--text-muted) shrink-0" />
-							<span class="font-semibold w-12 text-(--text-muted)">RUT:</span>
+							<CreditCard size={13} class="text-calypso-600 dark:text-calypso-400 shrink-0" />
+							<span class="font-semibold w-12 text-slate-500 dark:text-slate-300">RUT:</span>
 							{#if m.rut?.includes( 'TEMP' )}
 								<span
 									class="font-mono text-red-400 font-bold inline-flex items-center gap-1 cursor-help select-none"
@@ -183,21 +183,21 @@
 
 						{#if m.email}
 							<div class="flex items-center gap-2 text-(--text-secondary)">
-								<Mail size={13} class="text-(--text-muted) shrink-0" />
-								<span class="font-semibold w-12 text-(--text-muted)">Email:</span>
+								<Mail size={13} class="text-calypso-600 dark:text-calypso-400 shrink-0" />
+								<span class="font-semibold w-12 text-slate-500 dark:text-slate-300">Email:</span>
 								<span class="text-(--text-primary) truncate" title={m.email}>{m.email}</span>
 							</div>
 						{/if}
 
 						<div class="flex items-center gap-2 text-(--text-secondary)">
-							<Phone size={13} class="text-(--text-muted) shrink-0" />
-							<span class="font-semibold w-12 text-(--text-muted)">N° Cel:</span>
+							<Phone size={13} class="text-calypso-600 dark:text-calypso-400 shrink-0" />
+							<span class="font-semibold w-12 text-slate-500 dark:text-slate-300">N° Cel:</span>
 							<span class="text-(--text-primary)">{m.phone || '—'}</span>
 						</div>
 
 						<div class="flex items-center gap-2 text-(--text-secondary)">
-							<Landmark size={13} class="text-(--text-muted) shrink-0" />
-							<span class="font-semibold w-12 text-(--text-muted)">Org:</span>
+							<Landmark size={13} class="text-calypso-600 dark:text-calypso-400 shrink-0" />
+							<span class="font-semibold w-12 text-slate-500 dark:text-slate-300">Org:</span>
 							<span class="text-(--text-primary) truncate" title={getOrgLabel( m.organization )}>
 								{getOrgLabel( m.organization )}
 							</span>
@@ -221,7 +221,7 @@
 	<!-- Formulario en línea al final de la página (para ADMIN y AGGREGATOR) -->
 	{#if currentUserRole === 'ADMIN' || currentUserRole === 'AGGREGATOR'}
 		{#if hasTempRut}
-			<div class="card p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-3 text-xs text-amber-300 select-none">
+			<div class="hidden md:flex card p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl items-center gap-3 text-xs text-amber-300 select-none">
 				<CircleAlert size={18} class="shrink-0 text-amber-400" />
 				<div>
 					<p class="font-bold text-amber-200">No puedes agregar más integrantes aún</p>
@@ -229,7 +229,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="card p-5 bg-linear-to-b from-(--bg-surface) to-(--bg-surface-2) border border-(--border)/60 rounded-2xl">
+			<div class="hidden md:block card p-5 bg-linear-to-b from-(--bg-surface) to-(--bg-surface-2) border border-(--border)/60 rounded-2xl">
 				<h3 class="text-sm font-bold text-(--text-primary) mb-3 flex items-center gap-2 select-none">
 					<Users size={16} class="text-(--accent)" />
 					<span>Agregar Nuevo Miembro a la Familia</span>

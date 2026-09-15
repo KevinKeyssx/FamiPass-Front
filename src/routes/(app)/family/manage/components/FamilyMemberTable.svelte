@@ -223,7 +223,7 @@
 				<!-- Formulario en línea para agregar un nuevo miembro (para ADMIN y AGGREGATOR) -->
 				{#if currentUserRole === 'ADMIN' || currentUserRole === 'AGGREGATOR'}
 					{#if hasTempRut}
-						<tr class="bg-amber-500/5 select-none">
+						<tr class="hidden md:table-row bg-amber-500/5 select-none">
 							<td colspan={currentUserRole === 'ADMIN' ? 8 : 7} class="px-4 py-3 text-xs text-amber-300 text-center font-medium">
 								<div class="flex items-center justify-center gap-2">
 									<CircleAlert size={15} class="text-amber-400 shrink-0" />
@@ -232,12 +232,12 @@
 							</td>
 						</tr>
 					{:else}
-						<FamilyMemberRowForm currentUserRole={currentUserRole} onSubmit={onAdd} isSaving={isSaving} />
+						<FamilyMemberRowForm currentUserRole={currentUserRole} onSubmit={onAdd} isSaving={isSaving} class="hidden md:table-row" />
 					{/if}
 				{/if}
 
 				{#if saveError}
-					<tr class="bg-red-500/5 select-none">
+					<tr class="hidden md:table-row bg-red-500/5 select-none">
 						<td colspan={currentUserRole === 'ADMIN' ? 8 : 7} class="px-4 py-3 text-xs text-red-500 text-right font-semibold">
 							{saveError}
 						</td>
