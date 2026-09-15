@@ -202,7 +202,7 @@
 	<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 		<div>
 			<Select
-				label="Organización comunitaria"
+				label="Organización"
 				required={true}
 				options={orgOptions}
 				bind:value={organization}
@@ -249,7 +249,7 @@
 		/>
 	</div>
 
-	<div class="flex gap-3 justify-end pt-4">
+	<div class="flex gap-3 justify-end pt-4 pb-1 border-t border-(--border)/30">
 		<Button type="button" variant="secondary" onclick={onCancel}>
 			Cancelar
 		</Button>
