@@ -44,13 +44,15 @@
 			role              : FamilyMemberRole;
 		} ) => Promise<boolean>;
 		isSaving?        : boolean;
+		class?           : string;
 	}
 
 
     let {
 		currentUserRole = 'ADMIN',
 		onSubmit,
-		isSaving = false
+		isSaving = false,
+		class: extraClass = ''
 	}: Props = $props();
 
 	let full_name         = $state( '' );
@@ -138,7 +140,7 @@
 	}
 </script>
 
-<tr class="bg-(--bg-surface-2)/30 hover:bg-(--bg-surface-2)/50 transition-colors">
+<tr class="bg-(--bg-surface-2)/30 hover:bg-(--bg-surface-2)/50 transition-colors {extraClass}">
 	<td class="px-3 py-2.5 text-(--text-primary) font-semibold">
 		<InputText
 			placeholder="Ej: Juan Pérez"
