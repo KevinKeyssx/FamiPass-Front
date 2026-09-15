@@ -52,10 +52,10 @@
 
 		<!-- Panel -->
 		<div
-			class="relative z-10 w-full {size === 'lg' ? 'max-w-lg' : size === 'xl' ? 'max-w-xl' : 'max-w-md'} rounded-2xl border border-(--border) bg-(--bg-surface) shadow-(--shadow-lg) p-6 animate-in"
+			class="relative z-10 w-full {size === 'lg' ? 'max-w-lg' : size === 'xl' ? 'max-w-xl' : 'max-w-md'} max-h-[calc(100dvh-2rem)] flex flex-col rounded-2xl border border-(--border) bg-(--bg-surface) shadow-(--shadow-lg) p-6 animate-in"
 		>
 			<!-- Header -->
-			<div class="flex items-center justify-between mb-4">
+			<div class="flex items-center justify-between mb-4 shrink-0">
 				<h2 id="modal-title" class="text-lg font-bold text-(--text-primary)">
 					{title}
 				</h2>
@@ -72,13 +72,13 @@
 			</div>
 
 			<!-- Content -->
-			<div class="text-(--text-secondary) mb-6">
+			<div class="text-(--text-secondary) overflow-y-auto overscroll-contain pr-1 -mr-1 flex-1">
 				{@render children()}
 			</div>
 
 			<!-- Actions -->
 			{#if onConfirm}
-				<div class="flex gap-3 justify-end">
+				<div class="flex gap-3 justify-end pt-4 shrink-0">
 					<Button variant="secondary" onclick={onClose}>Cancelar</Button>
 					<Button variant={confirmVariant} onclick={onConfirm} {loading}>
 						{confirmLabel}
