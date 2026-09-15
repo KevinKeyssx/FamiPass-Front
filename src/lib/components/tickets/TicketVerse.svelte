@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { onMount, onDestroy }     from 'svelte';
-	import QRCodeStyling             from 'qr-code-styling';
-	import { theme }                 from '$lib/stores/theme.svelte.js';
-	import type { FamilyEvent, Order } from '$lib/types/index.js';
-	import { Crown, User as UserIcon, Users, ShoppingBasket } from '@lucide/svelte';
+	import { onMount, onDestroy }                                                     from 'svelte';
+	import QRCodeStyling                                                               from 'qr-code-styling';
+	import Modal                                                                       from '$lib/components/ui/Modal.svelte';
+	import { theme }                                                                   from '$lib/stores/theme.svelte.js';
+	import type { FamilyEvent, Order }                                                 from '$lib/types/index.js';
+	import { Crown, User as UserIcon, Users, ShoppingBasket, Copy, Check }             from '@lucide/svelte';
 
 	interface Props {
 		familyEvent : FamilyEvent & { orders? : Order[] };
@@ -13,8 +14,11 @@
 
 	let { familyEvent, order = null, isExpired = false }: Props = $props();
 
-	let qrContainer = $state<HTMLDivElement | null>( null );
-	let qrInstance  : QRCodeStyling | null = null;
+	let qrContainer   = $state<HTMLDivElement | null>( null );
+	let qrInstance    : QRCodeStyling | null = null;
+	let isQrModalOpen = $state<boolean>( false );
+	let qrSvgHtml     = $state<string>( '' );
+	let copied        = $state<boolean>( false );
 
 	const ordersTaken = $derived( familyEvent.orders?.length ?? 0 );
 	const maxOrders   = $derived( familyEvent.family?.members?.length ?? 0 );
@@ -58,6 +62,31 @@
 		} );
 	}
 
+	function openQrModal(): void {
+		if ( !qrContainer ) return;
+		qrSvgHtml     = qrContainer.innerHTML;
+		isQrModalOpen = true;
+	}
+
+	function closeQrModal(): void {
+		isQrModalOpen = false;
+	}
+
+	async function copyCode(): Promise<void> {
+		const code = familyEvent.short_code || familyEvent.qr_code_hash || '';
+		if ( !code ) return;
+
+		try {
+			await navigator.clipboard.writeText( code );
+			copied = true;
+			setTimeout( () => {
+				copied = false;
+			}, 2000 );
+		} catch ( err ) {
+			console.error( 'Error al copiar el código:', err );
+		}
+	}
+
 	function buildQR(): void {
 		if ( !qrUrl || !qrContainer ) return;
 
@@ -77,6 +106,10 @@
 		} );
 
 		qrInstance.append( qrContainer );
+
+		if ( isQrModalOpen ) {
+			qrSvgHtml = qrContainer.innerHTML;
+		}
 	}
 
 	onMount( () => {
@@ -218,7 +251,16 @@
 		{#if qrUrl}
 			<div class="t-stub">
 				<div class="t-qr-container">
-					<div bind:this={ qrContainer } class="t-qr-code"></div>
+					<div
+						class="t-qr-clickable"
+						onclick={ openQrModal }
+						role="button"
+						tabindex="0"
+						onkeydown={( e ) => { if ( e.key === 'Enter' || e.key === ' ' ) openQrModal(); }}
+						title="Haz clic para ver el QR en grande"
+					>
+						<div bind:this={ qrContainer } class="t-qr-code"></div>
+					</div>
 					<div class="t-qr-id font-mono font-black text-sm uppercase tracking-wider text-(--accent)">
 						CÓD: { familyEvent.short_code || familyEvent.qr_code_hash }
 					</div>
@@ -241,13 +283,74 @@
 				<div class="t-admit">
 					<div class="t-admit-text">Órdenes</div>
 					<div class="t-admit-num">
-						{ordersTaken}/{maxOrders}
+						{ ordersTaken }/{ maxOrders }
 					</div>
 				</div>
 			</div>
 		{/if}
 	</div>
 </div>
+
+{#if qrUrl}
+	<Modal
+		open={ isQrModalOpen }
+		title="Código QR del Ticket"
+		onClose={ closeQrModal }
+		size="md"
+	>
+		<div class="flex flex-col items-center text-center space-y-4 py-2">
+			<div class="space-y-1">
+				<h3 class="text-xl font-black uppercase text-(--text-primary) tracking-tight">
+					{ familyEvent.family?.family_name ?? 'FAMILIA' }
+				</h3>
+				<p class="text-xs font-semibold text-calypso-600 dark:text-calypso-400">
+					{ familyEvent.event?.event_name ?? 'Evento FamiPass' }
+				</p>
+			</div>
+
+			<div class="modal-qr-box p-4 rounded-2xl bg-(--bg-surface-2) border border-(--border) shadow-inner flex items-center justify-center">
+				<div class="modal-qr-container w-64 h-64 sm:w-72 sm:h-72">
+					{@html qrSvgHtml}
+				</div>
+			</div>
+
+			<div class="w-full max-w-xs flex flex-col items-center gap-1.5 p-3 rounded-xl bg-(--bg-surface-2)/60 border border-(--border)/60">
+				<span class="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">
+					Código de Validación
+				</span>
+				<div class="flex items-center gap-2">
+					<span class="font-mono font-black text-xl tracking-widest text-(--accent) select-all">
+						{ familyEvent.short_code || familyEvent.qr_code_hash }
+					</span>
+					<button
+						type="button"
+						class="p-1.5 rounded-lg text-(--text-muted) hover:text-(--accent) hover:bg-(--accent-muted) transition-colors cursor-pointer"
+						onclick={ copyCode }
+						title={ copied ? '¡Copiado!' : 'Copiar código' }
+						aria-label="Copiar código alfanumérico"
+					>
+						{#if copied}
+							<Check size={ 16 } class="text-emerald-400" />
+						{:else}
+							<Copy size={ 16 } />
+						{/if}
+					</button>
+				</div>
+			</div>
+
+			<div class="flex items-center justify-between w-full max-w-xs px-3 py-2 rounded-xl bg-(--bg-surface-2)/30 border border-(--border)/40 text-xs">
+				<span class="text-(--text-secondary) font-medium">Órdenes asignadas:</span>
+				<span class="font-bold text-(--accent) font-mono">
+					{ ordersTaken }/{ maxOrders }
+				</span>
+			</div>
+
+			<p class="text-xs text-(--text-secondary) max-w-xs leading-relaxed">
+				Muestra este código al operador para escanearlo o dictar el código alfanumérico al momento de retirar tus raciones.
+			</p>
+		</div>
+	</Modal>
+{/if}
 
 <style>
 	.ticket-wrapper {
@@ -465,5 +568,34 @@
 		line-height : 1;
 		color       : var( --accent );
 		text-shadow : 0 0 15px var( --shadow-glow );
+	}
+
+	.t-qr-clickable {
+		position      : relative;
+		border-radius : 12px;
+		cursor        : pointer;
+		transition    : transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.t-qr-clickable:hover {
+		transform  : scale( 1.05 );
+		box-shadow : 0 0 15px var( --t-accent-glow );
+	}
+
+	.modal-qr-box {
+		transition : box-shadow 0.3s ease;
+	}
+
+	.modal-qr-container {
+		display         : flex;
+		align-items     : center;
+		justify-content : center;
+	}
+
+	.modal-qr-container :global(svg) {
+		width   : 100% !important;
+		height  : 100% !important;
+		display : block;
+		filter  : drop-shadow( 0 4px 12px rgba( 0, 0, 0, 0.25 ) );
 	}
 </style>
