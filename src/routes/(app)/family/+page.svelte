@@ -1,14 +1,27 @@
 <script lang="ts">
-	import { invalidateAll }                                                               from '$app/navigation';
-	import { deserialize }                                                                 from '$app/forms';
-	import toast                                                                           from 'svelte-french-toast';
-	import TicketVerse                                                                     from '$lib/components/tickets/TicketVerse.svelte';
-	import Button                                                                          from '$lib/components/ui/Button.svelte';
-	import Select                                                                          from '$lib/components/ui/Select.svelte';
-	import InputText                                                                       from '$lib/components/ui/InputText.svelte';
-	import { isEventExpired }                                                              from '$lib/utils/date.js';
-	import { Users, Plus, Link2, Ticket, Settings, CalendarPlus, Search, X, CheckCircle2 } from '@lucide/svelte';
-	import type { Family, FamilyEvent, EventConfig }                                       from '$lib/types/index.js';
+	import { invalidateAll }    from '$app/navigation';
+	import { deserialize }      from '$app/forms';
+
+    import {
+        Users,
+        Plus,
+        Ticket,
+        Settings,
+        CalendarPlus,
+        Search,
+        X
+    }               from '@lucide/svelte';
+	import toast    from 'svelte-french-toast';
+
+	import type {
+        Family,
+        FamilyEvent,
+        EventConfig
+    }                           from '$lib/types/index.js';
+    import TicketVerse          from '$lib/components/tickets/TicketVerse.svelte';
+	import Button               from '$lib/components/ui/Button.svelte';
+	import EventSelect          from '$lib/components/ui/EventSelect.svelte';
+	import { isEventExpired }   from '$lib/utils/date.js';
 
 	interface Props {
 		data : {
@@ -25,13 +38,6 @@
 	let isJoining       = $state( false );
 	let searchQuery     = $state( '' );
 	let statusFilter    = $state<'ACTIVE' | 'ALL'>( 'ACTIVE' );
-
-	const eventOptions = $derived(
-		( data.availableEvents || [] ).map( ( ev ) => ( {
-			value : ev.id,
-			label : `${ ev.event_name } (${ ev.event_date })`
-		} ) )
-	);
 
 	const filteredTickets = $derived.by( () => {
 		let list = data.tickets || [];
@@ -180,7 +186,7 @@
 				</div>
 			</div>
 
-			{#if eventOptions.length === 0}
+			{#if ( data.availableEvents || [] ).length === 0}
 				<div class="p-4 rounded-xl bg-(--bg-surface-2) border border-(--border) text-center space-y-1">
 					<p class="text-xs font-bold text-(--text-primary)">
 						No hay nuevos eventos disponibles para inscripción en este momento.
@@ -192,10 +198,10 @@
 			{:else}
 				<form onsubmit={handleJoinEvent} class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
 					<div class="md:col-span-2">
-						<Select
+						<EventSelect
 							label="Evento Disponible"
 							bind:value={selectedEventId}
-							options={eventOptions}
+							events={data.availableEvents || []}
 							placeholder="Selecciona un evento para obtener tu ticket..."
 							required
 						/>
@@ -205,7 +211,7 @@
 						type="submit"
 						variant="primary"
 						size="md"
-						class="w-full h-10.5"
+						class="w-full h-[52px]"
 						loading={ isJoining }
 						disabled={ !selectedEventId || isJoining }
 					>
