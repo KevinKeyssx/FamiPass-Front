@@ -1,8 +1,10 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { theme }   from '$lib/stores/theme.svelte.js';
+
 	import { Toaster } from 'svelte-french-toast';
+
+    import { theme }   from '$lib/stores/theme.svelte.js';
 
 	interface Props {
 		children : import( 'svelte' ).Snippet;
