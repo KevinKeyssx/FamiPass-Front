@@ -152,8 +152,8 @@ html.dark {
 	--bg-sidebar     : rgba( 13, 27, 42, 0.9 );
 
 	--text-primary   : var( --slate-100 );
-	--text-secondary : var( --slate-400 );
-	--text-muted     : var( --slate-600 );
+	--text-secondary : var( --slate-300 );
+	--text-muted     : var( --slate-400 );
 	--text-inverted  : var( --color-navy-950 );
 
 	--border         : var( --color-navy-700 );
