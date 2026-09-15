@@ -24,10 +24,12 @@
 	import InputText            from '$lib/components/ui/InputText.svelte';
 	import Select               from '$lib/components/ui/Select.svelte';
 	import Modal                from '$lib/components/ui/Modal.svelte';
+	import Drawer               from '$lib/components/ui/Drawer.svelte';
 	import ViewSwitcher         from '$lib/components/shared/ViewSwitcher.svelte';
 	import FamilyMemberTable    from './components/FamilyMemberTable.svelte';
 	import FamilyMemberCard     from './components/FamilyMemberCard.svelte';
 	import FamilyMemberForm     from './components/FamilyMemberForm.svelte';
+	import AddMemberDrawerForm  from './components/AddMemberDrawerForm.svelte';
 	import { orgOptions }       from '$lib/constants/organization.js';
 
 
@@ -68,6 +70,8 @@
 	// Member states
 	let isSavingMember = $state( false );
 	let saveError      = $state<string | null>( null );
+	let isDrawerOpen   = $state( false );
+	let drawerError    = $state<string | null>( null );
 
 	// Filter states
 	let searchQuery          = $state( '' );
@@ -296,6 +300,27 @@
 		}
 	}
 
+	async function handleAddMemberFromDrawer( memberData : {
+		full_name         : string;
+		rut               : string;
+		email?            : string;
+		phone             : string;
+		organization      : CommunityOrganization;
+		is_representative : boolean;
+		role              : FamilyMemberRole;
+	} ): Promise<boolean> {
+		drawerError = null;
+		const success = await handleAddOrUpdateMember( memberData );
+
+		if ( success ) {
+			isDrawerOpen = false;
+			return true;
+		}
+
+		drawerError = saveError;
+		return false;
+	}
+
 	async function handleConfirmDelete(): Promise<void> {
 		if ( !memberToDelete ) return;
 		isDeletingMember = true;
@@ -351,16 +376,16 @@
 			</div>
 		</div>
 
-		{#if data.family}
+		<!-- {#if data.family}
 			<div class="relative z-10 shrink-0">
 				<ViewSwitcher />
 			</div>
-		{/if}
+		{/if} -->
 	</div>
 
 	<!-- Family Name Section -->
 	<div class="card p-6 space-y-4">
-		<div class="flex items-center justify-between">
+		<div class="flex items-center justify-between gap-0.5">
 			<h2 class="text-sm font-bold uppercase tracking-wider text-(--text-muted) flex items-center gap-2">
 				<Users size={16} class="text-(--accent)" />
 				<span>Nombre de la Familia</span>
@@ -368,19 +393,20 @@
 
 			{#if data.family}
 				{#if data.currentUserRole === 'ADMIN'}
-					<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-(--accent-muted) text-(--accent) select-none">
-						<Shield size={13} />
-						<span>Rol Administrador</span>
+					<span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-(--accent-muted) text-(--accent) select-none">
+						<Shield size={14} />
+
+						<span>Rol Admin</span>
 					</span>
 				{:else if data.currentUserRole === 'AGGREGATOR'}
 					<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 select-none">
-						<UserPlus size={13} />
+						<UserPlus size={14} />
 						<span>Rol Agregador</span>
 					</span>
 				{:else}
 					<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-(--bg-surface-2) text-(--text-muted) border border-(--border) select-none">
-						<Eye size={13} />
-						<span>Modo Solo Lectura</span>
+						<Eye size={14} />
+						<span>Solo Lectura</span>
 					</span>
 				{/if}
 			{/if}
@@ -431,19 +457,27 @@
 					</p>
 				</div>
 
-				{#if data.currentUserRole === 'ADMIN' || data.currentUserRole === 'AGGREGATOR'}
-					<div title={hasTempRut ? 'Debes actualizar tu RUT antes de agregar más integrantes' : ''}>
-						<Button
-							variant="primary"
-							size="sm"
-							onclick={openCreateModal}
-							disabled={hasTempRut}
-						>
-							<UserPlus size={14} />
-							<span>Agregar Miembro</span>
-						</Button>
-					</div>
-				{/if}
+                <div class="flex gap-2 items-center">
+                    {#if data.family}
+                        <div class="relative z-10 shrink-0">
+                            <ViewSwitcher />
+                        </div>
+                    {/if}
+
+                    {#if data.currentUserRole === 'ADMIN' || data.currentUserRole === 'AGGREGATOR'}
+                        <div class="hidden md:block" title={hasTempRut ? 'Debes actualizar tu RUT antes de agregar más integrantes' : ''}>
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onclick={openCreateModal}
+                                disabled={hasTempRut}
+                            >
+                                <UserPlus size={14} />
+                                <span>Agregar Miembro</span>
+                            </Button>
+                        </div>
+                    {/if}
+                </div>
 			</div>
 
 			<!-- Aviso de RUT temporal -->
@@ -569,6 +603,41 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Botón flotante para móvil (hasta md) -->
+{#if data.family && ( data.currentUserRole === 'ADMIN' || data.currentUserRole === 'AGGREGATOR' )}
+	<div
+		class="fixed bottom-20 right-4 sm:bottom-22 sm:right-6 z-40 md:hidden"
+		title={hasTempRut ? 'Debes actualizar tu RUT antes de agregar más integrantes' : ''}
+	>
+		<button
+			type="button"
+			onclick={() => { drawerError = null; isDrawerOpen = true; }}
+			disabled={hasTempRut}
+			class="flex items-center gap-2 px-3.5 sm:px-5 py-3.5 rounded-full bg-(--accent) text-(--accent-text) font-bold text-sm shadow-xl hover:shadow-2xl active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+			aria-label="Agregar Miembro"
+		>
+			<UserPlus size={22} />
+			<span class="hidden sm:flex">Agregar Miembro</span>
+		</button>
+	</div>
+{/if}
+
+<!-- Drawer para agregar miembro en móvil (hasta md) -->
+<Drawer
+	open={isDrawerOpen}
+	onClose={() => { isDrawerOpen = false; drawerError = null; }}
+	title="Agregar Nuevo Miembro"
+	description="Ingresa los datos del nuevo integrante familiar"
+>
+	<AddMemberDrawerForm
+		currentUserRole={data.currentUserRole}
+		onSubmit={handleAddMemberFromDrawer}
+		onCancel={() => { isDrawerOpen = false; drawerError = null; }}
+		loading={isSavingMember}
+		error={drawerError}
+	/>
+</Drawer>
 
 <!-- Modal para Crear / Editar Miembro -->
 <Modal
